@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#05070f">
+<title>Физика · 10 класс — Законы сохранения импульса и механической энергии</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⚛</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#05070f; --panel:#0c1428; --line:#1b2a4d;
+  --txt:#e8f0ff; --mut:#8fa3c8;
+  --cy:#22e4ff; --mg:#ff4fd8; --am:#ffb547; --gn:#42ffb4; --rd:#ff5468;
+  --glow-cy:0 0 10px rgba(34,228,255,.5),0 0 30px rgba(34,228,255,.22);
+  --glow-mg:0 0 10px rgba(255,79,216,.5),0 0 30px rgba(255,79,216,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Rubik',system-ui,sans-serif;color:var(--txt);min-height:100vh;
+  background:
+    radial-gradient(900px 480px at 88% -8%, rgba(34,228,255,.10), transparent 60%),
+    radial-gradient(820px 560px at -8% 104%, rgba(255,79,216,.09), transparent 60%),
+    linear-gradient(180deg,#070b18,var(--bg0));
+  overscroll-behavior:none;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(122,168,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(122,168,255,.05) 1px,transparent 1px);
+  background-size:32px 32px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 22%,#000 25%,transparent 85%);
+          mask-image:radial-gradient(ellipse at 50% 22%,#000 25%,transparent 85%);
+}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.35;pointer-events:none;z-index:0}
+.orb.o1{width:340px;height:340px;background:rgba(34,228,255,.16);top:-120px;right:-90px;animation:drift1 16s ease-in-out infinite alternate}
+.orb.o2{width:300px;height:300px;background:rgba(255,79,216,.13);bottom:-110px;left:-90px;animation:drift2 19s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(-60px,70px)}}
+@keyframes drift2{to{transform:translate(70px,-60px)}}
+#app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:20px 16px calc(40px + env(safe-area-inset-bottom))}
+.screen{display:none}
+.screen.active{display:block;animation:screenIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ── типографика ── */
+.kicker{font-family:'Unbounded';font-size:11px;letter-spacing:.22em;color:var(--cy);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.kicker::before{content:'';width:22px;height:2px;background:var(--cy);box-shadow:var(--glow-cy)}
+h1{font-family:'Unbounded';font-weight:800;font-size:clamp(21px,4.8vw,34px);line-height:1.22;margin:12px 0 6px;
+   text-shadow:0 0 24px rgba(34,228,255,.25)}
+h1 .acc{color:var(--cy)}
+.sub{color:var(--mut);font-size:14px;line-height:1.5}
+
+.card{background:linear-gradient(180deg,rgba(18,28,58,.85),rgba(10,16,34,.92));
+  border:1px solid var(--line);border-radius:16px;padding:20px;
+  box-shadow:0 14px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(160,200,255,.07)}
+
+/* ── герой: столкновение шаров ── */
+.hero{margin:18px 0;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:rgba(8,13,28,.6)}
+.hero svg{display:block;width:100%;height:auto}
+.hL{animation:hL 3.6s ease-in-out infinite}
+.hR{animation:hR 3.6s ease-in-out infinite}
+.hS{opacity:0;transform-box:fill-box;transform-origin:center;animation:hS 3.6s ease-out infinite}
+@keyframes hL{0%,12%{transform:translateX(0)}46%,58%{transform:translateX(72px)}92%,100%{transform:translateX(0)}}
+@keyframes hR{0%,12%{transform:translateX(0)}46%,58%{transform:translateX(-72px)}92%,100%{transform:translateX(0)}}
+@keyframes hS{0%,44%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.1)}62%,100%{opacity:0;transform:scale(.4)}}
+
+.teach{display:flex;align-items:center;gap:14px;margin:16px 0}
+.teach .mono{width:48px;height:48px;border-radius:12px;flex:0 0 48px;display:grid;place-items:center;
+  font-family:'Unbounded';font-weight:600;font-size:16px;color:#04121a;
+  background:linear-gradient(135deg,var(--cy),#59f0c8);box-shadow:var(--glow-cy)}
+.teach .tt{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.teach .tn{font-weight:700;font-size:16px}
+
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.fact{font-size:12.5px;font-weight:600;color:#bfe9ff;border:1px solid rgba(34,228,255,.35);
+  background:rgba(34,228,255,.07);border-radius:999px;padding:7px 13px}
+.fact.m{color:#ffd2f1;border-color:rgba(255,79,216,.35);background:rgba(255,79,216,.07)}
+.fact.a{color:#ffe3b0;border-color:rgba(255,181,71,.4);background:rgba(255,181,71,.07)}
+
+/* ── формы ── */
+.flabel{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:16px 0 7px;font-weight:600}
+.inp,.sel select{width:100%;font:500 16px 'Rubik';color:var(--txt);background:rgba(9,15,32,.8);
+  border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none;transition:.25s;appearance:none;-webkit-appearance:none}
+.inp:focus,.sel select:focus{border-color:var(--cy);box-shadow:0 0 0 1px var(--cy),var(--glow-cy)}
+.inp::placeholder{color:#5a6c92}
+.sel{position:relative}
+.sel::after{content:'▾';position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--cy);pointer-events:none;font-size:14px}
+.sel select option{background:#0c1428;color:var(--txt)}
+.err{color:var(--rd);font-size:13px;margin-top:12px;display:none}
+.err.on{display:block;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.attnote{margin-top:14px;font-size:13px;color:var(--am)}
+
+/* ── кнопки ── */
+.btn{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;
+  font-family:'Unbounded';font-weight:600;font-size:15px;padding:16px 20px;margin-top:22px;
+  border-radius:13px;border:1px solid var(--line);background:rgba(13,22,46,.7);color:#5a6c92;
+  cursor:not-allowed;transition:.3s;touch-action:manipulation}
+.btn.lit{color:#fff;border-color:var(--cy);cursor:pointer;
+  background:linear-gradient(90deg,rgba(34,228,255,.2),rgba(255,79,216,.2));
+  box-shadow:var(--glow-cy);animation:pulse 1.8s ease-in-out infinite}
+.btn.lit:active{transform:scale(.98)}
+@keyframes pulse{50%{box-shadow:0 0 16px rgba(34,228,255,.7),0 0 44px rgba(255,79,216,.3)}}
+
+/* ── дисклеймер ── */
+.rules{list-style:none;margin-top:6px}
+.rules li{display:flex;gap:13px;padding:13px 0;border-bottom:1px dashed rgba(90,115,170,.25);font-size:14.5px;line-height:1.5;color:#c9d7f2}
+.rules li:last-child{border-bottom:none}
+.rules .ic{flex:0 0 38px;height:38px;display:grid;place-items:center;font-size:17px;border-radius:10px;
+  background:rgba(34,228,255,.08);border:1px solid rgba(34,228,255,.3)}
+.rules li:nth-child(2n) .ic{background:rgba(255,79,216,.08);border-color:rgba(255,79,216,.3)}
+.chk{display:flex;gap:12px;align-items:flex-start;margin-top:18px;font-size:14px;line-height:1.5;cursor:pointer}
+.chk input{width:22px;height:22px;flex:0 0 22px;accent-color:var(--cy);cursor:pointer}
+
+/* ── тест ── */
+.qtop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.qcount{font-family:'Unbounded';font-size:13px;letter-spacing:.1em;color:var(--mut)}
+.qcount b{font-size:24px;color:var(--cy);text-shadow:var(--glow-cy)}
+.qcount span{font-size:14px}
+.schips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.schip{font-size:11.5px;font-weight:600;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:4px 11px;background:rgba(10,17,36,.7);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress{height:6px;border-radius:99px;background:rgba(20,32,66,.9);overflow:hidden;margin-bottom:16px;border:1px solid rgba(60,90,160,.25)}
+.progress i{display:block;height:100%;width:0;border-radius:99px;transition:width .5s;
+  background:linear-gradient(90deg,var(--cy),var(--mg));box-shadow:0 0 12px rgba(34,228,255,.6)}
+.timerbox{position:relative;width:64px;height:64px;flex:0 0 64px}
+.timerbox svg{width:100%;height:100%}
+.t-bg{fill:none;stroke:rgba(60,90,160,.35);stroke-width:5}
+.t-fg{fill:none;stroke:var(--cy);stroke-width:5;stroke-linecap:round;stroke-dasharray:163.36;
+  transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s linear,stroke .4s;
+  filter:drop-shadow(0 0 5px rgba(34,228,255,.7))}
+.t-fg.warn{stroke:var(--am)}
+.t-fg.danger{stroke:var(--rd);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.45}}
+.ttext{position:absolute;inset:0;display:grid;place-items:center;font-family:'Unbounded';font-size:13px;font-weight:600}
+
+.qcard{position:relative}
+.qcard.locked{pointer-events:none;opacity:.75}
+.qtype{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.qtype.t-mcq{color:#7ff0ff;border:1px solid rgba(34,228,255,.45);background:rgba(34,228,255,.08)}
+.qtype.t-calc{color:#ffb0ea;border:1px solid rgba(255,79,216,.45);background:rgba(255,79,216,.08)}
+.qtext{font-size:16.5px;font-weight:500;line-height:1.55;margin-bottom:16px}
+.qformulas{font-size:18px}
+.qfig{margin:0 0 16px}
+.fig{display:block;width:100%;height:auto;border-radius:12px}
+.fig text{font-family:'Rubik',sans-serif}
+.fig .fn{font-size:10px;fill:#8fa3c8}
+.fig .fx{font-size:11.5px;fill:#7fd8ff;font-weight:700}
+.fig .fl{font-size:12.5px;fill:#e6efff;font-weight:600}
+.fig .flc{font-size:12.5px;fill:#7fd8ff;font-weight:600}
+.fig .flm{font-size:12.5px;fill:#ff9bea;font-weight:600}
+.fig .fla{font-size:13px;fill:#ffb547;font-weight:700}
+
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  font:500 15px 'Rubik';color:#cfdcf5;background:rgba(13,22,46,.72);
+  border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:.22s;touch-action:manipulation}
+.opt:hover{border-color:rgba(34,228,255,.5);transform:translateY(-1px)}
+.opt .badge{flex:0 0 32px;height:32px;display:grid;place-items:center;border-radius:9px;
+  font-family:'Unbounded';font-size:13px;font-weight:600;color:var(--cy);
+  border:1px solid rgba(34,228,255,.4);background:rgba(34,228,255,.06);transition:.22s}
+.opt.sel{border-color:var(--cy);background:rgba(34,228,255,.08);
+  box-shadow:0 0 0 1px var(--cy),0 0 18px rgba(34,228,255,.35),inset 0 0 26px rgba(34,228,255,.07);color:#fff}
+.opt.sel .badge{background:var(--cy);color:#03131c;box-shadow:var(--glow-cy);border-color:var(--cy)}
+.opt.fopt{justify-content:center;font-size:19px;font-weight:600;padding:16px 14px;letter-spacing:.02em}
+.opt.fopt .badge{order:-1}
+
+.calcbox{display:flex;align-items:center;gap:12px}
+.calcbox input{flex:1;min-width:0;font:600 22px 'Rubik';text-align:center;color:#fff;letter-spacing:.04em;
+  background:rgba(9,15,32,.85);border:1px solid var(--line);border-radius:12px;padding:14px 12px;outline:none;transition:.25s}
+.calcbox input:focus{border-color:var(--mg);box-shadow:0 0 0 1px var(--mg),var(--glow-mg)}
+.calcbox .unit{font-family:'Unbounded';font-size:14px;color:var(--am);border:1px dashed rgba(255,181,71,.5);
+  border-radius:10px;padding:12px 14px;white-space:nowrap}
+.calcnote{font-size:12.5px;color:var(--mut);margin-top:10px;line-height:1.5}
+
+/* ── оверлеи ── */
+.ov{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;
+  background:rgba(4,7,16,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.ov.on{display:flex;animation:screenIn .3s}
+.ovcard{max-width:420px;width:100%;text-align:center;border-radius:18px;padding:28px 22px;
+  background:linear-gradient(180deg,#141d3c,#0b1226);border:1px solid rgba(255,181,71,.55);
+  box-shadow:0 0 30px rgba(255,181,71,.25)}
+.ovcard .big{font-size:40px}
+.ovcard h3{font-family:'Unbounded';font-size:18px;color:var(--am);margin:10px 0;letter-spacing:.05em}
+.ovcard p{font-size:14px;line-height:1.55;color:#dbe5f8}
+.ovcard .btn{margin-top:18px}
+.toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-160%);z-index:70;
+  font:600 13.5px 'Rubik';color:#0b1226;background:linear-gradient(90deg,var(--cy),#59f0c8);
+  padding:12px 20px;border-radius:999px;box-shadow:var(--glow-cy);transition:transform .4s cubic-bezier(.2,.8,.2,1);white-space:nowrap}
+.toast.on{transform:translate(-50%,0)}
+
+/* ── результаты ── */
+.statuschip{display:inline-block;font-family:'Unbounded';font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  padding:7px 14px;border-radius:999px;margin-bottom:16px}
+.statuschip.ok{color:var(--gn);border:1px solid rgba(66,255,180,.5);background:rgba(66,255,180,.07)}
+.statuschip.bad{color:var(--rd);border:1px solid rgba(255,84,104,.55);background:rgba(255,84,104,.08)}
+.reswrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0 4px}
+.rring{width:172px;height:172px}
+.rr-bg{fill:none;stroke:rgba(60,90,160,.3);stroke-width:9}
+.rr-fg{fill:none;stroke:var(--cy);stroke-width:9;stroke-linecap:round;stroke-dasharray:364.42;stroke-dashoffset:364.42;
+  transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
+.rr-score{font-family:'Unbounded';font-weight:800;font-size:34px;fill:#fff;text-anchor:middle}
+.rr-max{font-size:12px;fill:var(--mut);text-anchor:middle;letter-spacing:.14em}
+.verdict{font-family:'Unbounded';font-size:16px;margin-top:6px}
+.resreason{font-size:13.5px;color:var(--rd);text-align:center;margin-top:6px;line-height:1.5}
+.metagrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.meta{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(9,15,32,.6)}
+.meta .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}
+.meta .v{font-size:14.5px;font-weight:600;word-break:break-word}
+.sendline{margin-top:16px;font-size:13.5px;color:var(--mut);display:flex;align-items:center;gap:9px;min-height:22px}
+.spin{width:15px;height:15px;flex:0 0 15px;border-radius:50%;border:2px solid rgba(34,228,255,.25);border-top-color:var(--cy);animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.tsign{margin-top:18px;font-size:12px;color:var(--mut);text-align:center;line-height:1.5}
+.foot{margin-top:26px;text-align:center;font-size:11.5px;color:#4d5f85;letter-spacing:.06em}
+
+@media (min-width:820px){
+  #app{padding-top:34px}
+  .start-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div id="app">
+
+  <!-- ═══════════ ОКНО 1 · АНКЕТА ═══════════ -->
+  <section id="screen-start" class="screen active">
+    <div class="start-grid">
+      <div>
+        <div class="kicker">Физика · 10 класс · Механика</div>
+        <h1>Законы сохранения <span class="acc">импульса</span> и <span class="acc">механической энергии</span></h1>
+        <p class="sub">Контрольный тест по учебной цели 10.1.4.1 — «объяснять законы сохранения». 10 вопросов · 1 балл за каждый.</p>
+
+        <div class="teach card" style="padding:15px 18px">
+          <div class="mono">КД</div>
+          <div>
+            <div class="tt">Учитель физики</div>
+            <div class="tn">Кунгозин Даулет Багдашұлы</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="hero" aria-hidden="true">
+          <svg viewBox="0 0 340 150">
+            <defs>
+              <pattern id="hgrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M20 0H0V20" fill="none" stroke="rgba(120,170,255,.1)"/>
+              </pattern>
+              <marker id="hcy" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22e4ff"/></marker>
+              <marker id="hmg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff4fd8"/></marker>
+            </defs>
+            <rect width="340" height="150" fill="url(#hgrid)"/>
+            <line x1="20" y1="122" x2="320" y2="122" stroke="#31518a" stroke-width="1.5"/>
+            <g class="hL">
+              <circle cx="74" cy="88" r="24" fill="rgba(34,228,255,.12)" stroke="#22e4ff" stroke-width="2"/>
+              <text x="74" y="93" text-anchor="middle" fill="#7ff0ff" font-size="12" font-weight="700">m₁</text>
+              <line x1="102" y1="88" x2="140" y2="88" stroke="#22e4ff" stroke-width="2.4" marker-end="url(#hcy)"/>
+            </g>
+            <g class="hR">
+              <circle cx="266" cy="88" r="24" fill="rgba(255,79,216,.12)" stroke="#ff4fd8" stroke-width="2"/>
+              <text x="266" y="93" text-anchor="middle" fill="#ff9bea" font-size="12" font-weight="700">m₂</text>
+              <line x1="238" y1="88" x2="200" y2="88" stroke="#ff4fd8" stroke-width="2.4" marker-end="url(#hmg)"/>
+            </g>
+            <g class="hS" stroke="#ffb547" stroke-width="2.4" stroke-linecap="round">
+              <path d="M170 70v-14M170 106v14M152 88h-14M188 88h14M157 75l-9-9M183 75l9-9M157 101l-9 9M183 101l9 9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="facts">
+          <span class="fact">📋 10 вопросов</span>
+          <span class="fact m">⏱ 1 мин 30 сек на вопрос</span>
+          <span class="fact a">🏆 Максимум 10 баллов</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="kicker">Данные ученика</div>
+
+      <label class="flabel" for="inpFio">ФИ ученика</label>
+      <input class="inp" id="inpFio" type="text" autocomplete="name" maxlength="80" placeholder="Фамилия Имя">
+
+      <label class="flabel" for="selKlass">Класс</label>
+      <div class="sel">
+        <select id="selKlass">
+          <option value="" selected disabled>Выберите класс</option>
+          <option>10 Б</option>
+          <option>10 В</option>
+        </select>
+      </div>
+
+      <label class="flabel" for="selVariant">Вариант</label>
+      <div class="sel">
+        <select id="selVariant">
+          <option value="" selected disabled>Выберите вариант</option>
+          <option value="1">Вариант 1</option>
+          <option value="2">Вариант 2</option>
+        </select>
+      </div>
+
+      <div class="err" id="startErr">Пожалуйста, заполните все поля.</div>
+      <button class="btn" id="btnToRules">Продолжить →</button>
+      <div class="attnote" id="attNote" hidden></div>
+    </div>
+    <div class="foot">Академическая честность обязательна · Каждое прохождение засчитывается как попытка</div>
+  </section>
+
+  <!-- ═══════════ ОКНО 2 · ДИСКЛЕЙМЕР ═══════════ -->
+  <section id="screen-disclaimer" class="screen">
+    <div class="kicker">Дисклеймер</div>
+    <h1>Правила теста</h1>
+    <div class="card">
+      <ul class="rules">
+        <li><span class="ic">✍️</span><span>Тест выполняется <b>индивидуально</b>. Использование учебника, конспектов, калькулятора, интернета и посторонней помощи запрещено — это нарушение академической честности.</span></li>
+        <li><span class="ic">⏱️</span><span>На каждый вопрос — <b>1 минута 30 секунд</b>. Когда время истекает, тест автоматически переходит к следующему вопросу.</span></li>
+        <li><span class="ic">⛔</span><span>Вернуться к предыдущему вопросу <b>нельзя</b>. Правильные и неправильные ответы во время теста не показываются.</span></li>
+        <li><span class="ic">🛡️</span><span><b>Античит:</b> сворачивание вкладки/браузера немедленно завершает тест. Выдвижение второго окна поверх теста — первый раз предупреждение, второй раз тест завершается автоматически.</span></li>
+        <li><span class="ic">🔁</span><span>Каждое прохождение теста (в том числе завершённое античитом) засчитывается как <b>одна попытка</b>.</span></li>
+        <li><span class="ic">📤</span><span>Результат будет отправлен учителю в Google Таблицы.</span></li>
+      </ul>
+      <label class="chk"><input type="checkbox" id="chkAgree"><span>Я прочитал(а) правила и обязуюсь соблюдать академическую честность</span></label>
+      <button class="btn" id="btnStart">Начать тест</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ ОКНО 3 · ТЕСТ ═══════════ -->
+  <section id="screen-quiz" class="screen">
+    <div class="schips"><span class="schip" id="chipFio"></span><span class="schip" id="chipKlass"></span><span class="schip" id="chipVar"></span></div>
+    <div class="qtop">
+      <div class="qcount">ВОПРОС <b id="qNum">1</b><span>/10</span></div>
+      <div class="timerbox" aria-hidden="true">
+        <svg viewBox="0 0 60 60">
+          <circle class="t-bg" cx="30" cy="30" r="26"/>
+          <circle class="t-fg" id="tRing" cx="30" cy="30" r="26"/>
+        </svg>
+        <div class="ttext" id="tText">1:30</div>
+      </div>
+    </div>
+    <div class="progress"><i id="qBar"></i></div>
+    <div class="card qcard" id="qCard">
+      <div class="qtype" id="qType"></div>
+      <p class="qtext" id="qText"></p>
+      <div class="qfig" id="qFig"></div>
+      <div id="qBody"></div>
+      <button class="btn" id="btnNext">Далее →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ ОКНО 4 · РЕЗУЛЬТАТЫ ═══════════ -->
+  <section id="screen-result" class="screen">
+    <div class="kicker">Итоги</div>
+    <h1>Результаты теста</h1>
+    <div class="card">
+      <span class="statuschip ok" id="statusChip">Тест завершён</span>
+      <div class="reswrap">
+        <svg class="rring" viewBox="0 0 140 140">
+          <circle class="rr-bg" cx="70" cy="70" r="58"/>
+          <circle class="rr-fg" id="ringFg" cx="70" cy="70" r="58"/>
+          <text class="rr-score" id="resScore" x="70" y="74">0</text>
+          <text class="rr-max" x="70" y="94">ИЗ 10 БАЛЛОВ</text>
+        </svg>
+        <div class="verdict" id="resVerdict"></div>
+        <div class="resreason" id="resReason" hidden></div>
+      </div>
+      <div class="metagrid">
+        <div class="meta"><div class="k">Ученик</div><div class="v" id="resFio">—</div></div>
+        <div class="meta"><div class="k">Класс</div><div class="v" id="resKlass">—</div></div>
+        <div class="meta"><div class="k">Вариант</div><div class="v" id="resVariant">—</div></div>
+        <div class="meta"><div class="k">Попыток использовано</div><div class="v" id="resAttempts">—</div></div>
+      </div>
+      <div class="sendline" id="sendStatus"></div>
+      <div class="tsign">Результат получает учитель физики:<br><b>Кунгозин Даулет Багдашұлы</b></div>
+      <button class="btn lit" id="btnHome">На главный экран</button>
+    </div>
+  </section>
+</div>
+
+<!-- Оверлей предупреждения античита -->
+<div class="ov" id="warnOv">
+  <div class="ovcard">
+    <div class="big">⚠️</div>
+    <h3>Предупреждение</h3>
+    <p>Зафиксировано выдвижение окна поверх теста. Тест продолжается.<br><br>При <b>повторном</b> нарушении тест будет завершён автоматически, и попытка будет засчитана.</p>
+    <button class="btn lit" id="btnWarnOk" style="border-color:var(--am);background:rgba(255,181,71,.15)">Понятно, продолжаю</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   НАСТРОЙКА: вставьте URL веб-приложения Google Apps Script
+   (Развернуть → Веб-приложение → «У кого есть доступ: Все»)
+═══════════════════════════════════════════════════════════════ */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzjXnfuSM7pv2gFd2MFxMGMB24Fru4Nj5ezJ3GK2RmG2RkCnZKwtuBoAxrSYseDPvziZg/exec';
+
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ─────────── ГРАФИКА (SVG: сетка «в клетку», оси, подписи, нумерация) ─────────── */
+const wrapFig = (id,w,h,body)=>`<svg class="fig" viewBox="0 0 ${w} ${h}" role="img">
+<defs>
+<pattern id="gr${id}" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(120,170,255,.10)"/></pattern>
+<filter id="gl${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="ax${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6f8fc9"/></marker>
+<marker id="cy${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#22e4ff"/></marker>
+<marker id="mg${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff4fd8"/></marker>
+<marker id="am${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ffb547"/></marker>
+</defs>
+<rect x="1" y="1" width="${w-2}" height="${h-2}" rx="12" fill="rgba(9,15,32,.55)" stroke="rgba(120,170,255,.16)"/>
+<rect x="1" y="1" width="${w-2}" height="${h-2}" rx="12" fill="url(#gr${id})"/>
+${body}</svg>`;
+
+const axisX = (id,y,x2,nums)=>{ // ось x с нумерацией (шаг подписей = 2 м)
+  let s=`<line x1="20" y1="${y}" x2="${x2}" y2="${y}" stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#ax${id})"/>`;
+  for(let i=0;i<5;i++){const x=20+i*80;
+    s+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+6}" stroke="#6f8fc9"/><text class="fn" x="${x}" y="${y+18}" text-anchor="middle">${i*2}</text>`;}
+  for(let i=0;i<4;i++){const x=60+i*80;s+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+4}" stroke="#41609c"/>`;}
+  s+=`<text class="fx" x="${x2-6}" y="${y+20}" text-anchor="end">x, м</text>`;return s;};
+
+const SVGS = {
+/* В1·№2 — встречное движение шаров */
+v1q2: wrapFig('a1',360,205, axisX('a1',152,344) + `
+<circle cx="90" cy="118" r="23" fill="rgba(34,228,255,.1)" stroke="#22e4ff" stroke-width="2" filter="url(#gla1)"/>
+<text class="flc" x="90" y="78" text-anchor="middle">m₁ = 2 кг</text>
+<line x1="118" y1="118" x2="166" y2="118" stroke="#22e4ff" stroke-width="2.5" marker-end="url(#cya1)"/>
+<text class="flc" x="142" y="104" text-anchor="middle">v₁ = 3 м/с</text>
+<circle cx="270" cy="118" r="23" fill="rgba(255,79,216,.1)" stroke="#ff4fd8" stroke-width="2" filter="url(#gla1)"/>
+<text class="flm" x="270" y="78" text-anchor="middle">m₂ = 3 кг</text>
+<line x1="242" y1="118" x2="194" y2="118" stroke="#ff4fd8" stroke-width="2.5" marker-end="url(#mga1)"/>
+<text class="flm" x="218" y="104" text-anchor="middle">v₂ = 2 м/с</text>`),
+
+/* В1·№4 — график Eₖ(v), m = 2 кг */
+v1q4: wrapFig('a2',320,262, `
+<line x1="60" y1="215" x2="306" y2="215" stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axa2)"/>
+<line x1="60" y1="215" x2="60" y2="20"  stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axa2)"/>
+${[1,2,3,4,5].map(v=>`<line x1="${60+v*40}" y1="215" x2="${60+v*40}" y2="221" stroke="#6f8fc9"/><text class="fn" x="${60+v*40}" y="234" text-anchor="middle">${v}</text>`).join('')}
+${[4,8,12,16,20].map(E=>`<line x1="54" y1="${215-E*5}" x2="60" y2="${215-E*5}" stroke="#6f8fc9"/><text class="fn" x="50" y="${218-E*5}" text-anchor="end">${E}</text>`).join('')}
+<text class="fn" x="50" y="230" text-anchor="end">0</text>
+<text class="fx" x="304" y="252" text-anchor="end">v, м/с</text>
+<text class="fx" x="10" y="16">Eₖ, Дж</text>
+<path d="M220 215V135H60" fill="none" stroke="rgba(255,79,216,.45)" stroke-dasharray="4 4"/>
+<circle cx="220" cy="135" r="4" fill="#22e4ff" filter="url(#gla2)"/>
+<path d="M60 215 Q160 215 260 90" fill="none" stroke="#ff4fd8" stroke-width="3" stroke-linecap="round" filter="url(#gla2)"/>`),
+
+/* В1·№5 — бросок вертикально вверх, точки A, B, C */
+v1q5: wrapFig('a3',300,230, `
+<line x1="30" y1="195" x2="285" y2="195" stroke="#6f8fc9" stroke-width="1.6"/>
+<path d="M45 195l-8 9M75 195l-8 9M105 195l-8 9M135 195l-8 9M165 195l-8 9M195 195l-8 9M225 195l-8 9M255 195l-8 9M285 195l-8 9" stroke="#3a5a8c"/>
+<line x1="58" y1="200" x2="58" y2="16" stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axa3)"/>
+${[[2,155],[4,115],[6,75],[8,35]].map(([n,y])=>`<line x1="52" y1="${y}" x2="58" y2="${y}" stroke="#6f8fc9"/><text class="fn" x="48" y="${y+3}" text-anchor="end">${n}</text>`).join('')}
+<text class="fn" x="48" y="198" text-anchor="end">0</text>
+<text class="fx" x="66" y="20">h, м</text>
+<path d="M110 195 Q170 -85 230 195" fill="none" stroke="#22e4ff" stroke-width="2" stroke-dasharray="6 5" opacity=".85"/>
+<line x1="110" y1="180" x2="110" y2="130" stroke="#22e4ff" stroke-width="2.5" marker-end="url(#cya3)"/>
+<text class="flc" x="92" y="152">v₀</text>
+<circle cx="110" cy="195" r="5" fill="#22e4ff"/><text class="flc" x="96" y="188">A</text>
+<circle cx="170" cy="55" r="6" fill="#ff4fd8" filter="url(#gla3)"/><text class="flm" x="170" y="38" text-anchor="middle">B</text>
+<circle cx="230" cy="195" r="5" fill="#22e4ff"/><text class="flc" x="240" y="188">C</text>`),
+
+/* В2·№4 — упругий удар одинаковых шаров */
+v2q4: wrapFig('b1',360,195, axisX('b1',152,344) + `
+<text class="fl" x="180" y="52" text-anchor="middle">m₁ = m₂ = m</text>
+<circle cx="95" cy="114" r="23" fill="rgba(34,228,255,.1)" stroke="#22e4ff" stroke-width="2" filter="url(#glb1)"/>
+<text class="flc" x="95" y="119" text-anchor="middle">m</text>
+<line x1="123" y1="114" x2="170" y2="114" stroke="#22e4ff" stroke-width="2.5" marker-end="url(#cyb1)"/>
+<text class="flc" x="146" y="100" text-anchor="middle">v = 2 м/с</text>
+<circle cx="265" cy="114" r="23" fill="rgba(255,79,216,.1)" stroke="#ff4fd8" stroke-width="2" filter="url(#glb1)"/>
+<text class="flm" x="265" y="119" text-anchor="middle">m</text>
+<line x1="237" y1="114" x2="190" y2="114" stroke="#ff4fd8" stroke-width="2.5" marker-end="url(#mgb1)"/>
+<text class="flm" x="214" y="100" text-anchor="middle">v = 2 м/с</text>`),
+
+/* В2·№5 — пружина, деформация x */
+v2q5: wrapFig('b2',360,185, `
+<line x1="42" y1="42" x2="42" y2="128" stroke="#6f8fc9" stroke-width="2.5"/>
+<path d="M42 52l-11 11M42 74l-11 11M42 96l-11 11M42 118l-11 11" stroke="#41609c"/>
+<path d="M42 85 L58 63 L78 107 L98 63 L118 107 L138 63 L158 107 L178 63 L196 85" fill="none" stroke="#22e4ff" stroke-width="2.5" stroke-linejoin="round" filter="url(#glb2)"/>
+<rect x="196" y="60" width="46" height="50" rx="8" fill="rgba(255,79,216,.1)" stroke="#ff4fd8" stroke-width="2" filter="url(#glb2)"/>
+<text class="flm" x="219" y="90" text-anchor="middle">m</text>
+<line x1="150" y1="55" x2="150" y2="122" stroke="#6f8fc9" stroke-dasharray="5 4"/>
+<path d="M150 122v18M196 112v28" stroke="#41609c" stroke-dasharray="3 3"/>
+<line x1="152" y1="138" x2="194" y2="138" stroke="#ffb547" stroke-width="2" marker-start="url(#amb2)" marker-end="url(#amb2)"/>
+<text class="fla" x="173" y="160" text-anchor="middle">x</text>`),
+
+/* В2·№6 — график Eₚ(h) */
+v2q6: wrapFig('b3',320,300, `
+<line x1="60" y1="265" x2="306" y2="265" stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axb3)"/>
+<line x1="60" y1="265" x2="60" y2="20"  stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axb3)"/>
+${[1,2,3,4,5].map(h=>`<line x1="${60+h*40}" y1="265" x2="${60+h*40}" y2="271" stroke="#6f8fc9"/><text class="fn" x="${60+h*40}" y="284" text-anchor="middle">${h}</text>`).join('')}
+${[20,40,60,80,100].map(E=>`<line x1="54" y1="${265-E*2}" x2="60" y2="${265-E*2}" stroke="#6f8fc9"/><text class="fn" x="50" y="${268-E*2}" text-anchor="end">${E}</text>`).join('')}
+<text class="fn" x="50" y="280" text-anchor="end">0</text>
+<text class="fx" x="304" y="296" text-anchor="end">h, м</text>
+<text class="fx" x="10" y="16">Eₚ, Дж</text>
+<path d="M260 265V65H60" fill="none" stroke="rgba(34,228,255,.45)" stroke-dasharray="4 4"/>
+<line x1="60" y1="265" x2="260" y2="65" stroke="#ff4fd8" stroke-width="3" stroke-linecap="round" filter="url(#glb3)"/>
+<circle cx="260" cy="65" r="4" fill="#22e4ff" filter="url(#glb3)"/>`),
+
+/* В2·№9 — бросок вверх, рисунок к задаче */
+v2q9: wrapFig('b4',300,220, `
+<line x1="30" y1="185" x2="285" y2="185" stroke="#6f8fc9" stroke-width="1.6"/>
+<path d="M45 185l-8 9M75 185l-8 9M105 185l-8 9M135 185l-8 9M165 185l-8 9M195 185l-8 9M225 185l-8 9M255 185l-8 9M285 185l-8 9" stroke="#3a5a8c"/>
+<line x1="66" y1="190" x2="66" y2="16" stroke="#6f8fc9" stroke-width="1.4" marker-end="url(#axb4)"/>
+${[[2,145],[4,105],[6,65],[8,25]].map(([n,y])=>`<line x1="60" y1="${y}" x2="66" y2="${y}" stroke="#6f8fc9"/><text class="fn" x="56" y="${y+3}" text-anchor="end">${n}</text>`).join('')}
+<text class="fn" x="56" y="188" text-anchor="end">0</text>
+<text class="fx" x="74" y="20">h, м</text>
+<circle cx="170" cy="173" r="12" fill="rgba(34,228,255,.14)" stroke="#22e4ff" stroke-width="2" filter="url(#glb4)"/>
+<line x1="170" y1="156" x2="170" y2="104" stroke="#22e4ff" stroke-width="2.5" marker-end="url(#cyb4)"/>
+<text class="flc" x="182" y="132">v₀ = 10 м/с</text>
+<circle cx="170" cy="85" r="10" fill="none" stroke="#ff4fd8" stroke-width="2" stroke-dasharray="4 3"/>`)
+};
+
+/* ─────────── БАНК ВОПРОСОВ ─────────── */
+const BANK = {
+'1':[
+ {type:'mcq', text:'Закон сохранения импульса выполняется…',
+  opts:['в любой системе тел','в замкнутой системе тел','только при неупругих столкновениях','только при действии силы трения'], a:1},
+ {type:'mcq', fig:'v1q2', text:'Два шара движутся навстречу друг другу вдоль оси x (см. рисунок). Чему равен модуль суммарного импульса системы шаров?',
+  opts:['12 кг·м/с','6 кг·м/с','0','10 кг·м/с'], a:2},
+ {type:'mcq', form:true, text:'Кинетическая энергия тела массой m, движущегося со скоростью v, определяется по формуле:',
+  opts:['Eₖ = mv²/2','Eₖ = mv','Eₖ = mgh','Eₖ = kx²/2'], a:0},
+ {type:'mcq', fig:'v1q4', text:'На графике показана зависимость кинетической энергии тела массой 2 кг от скорости движения. Во сколько раз увеличится кинетическая энергия тела, если скорость увеличить в 2 раза?',
+  opts:['в 2 раза','не изменится','уменьшится в 2 раза','в 4 раза'], a:3},
+ {type:'mcq', fig:'v1q5', text:'Мяч брошен вертикально вверх со скоростью v₀ (см. рисунок). Сопротивление воздуха не учитывать. В какой точке траектории потенциальная энергия мяча максимальна?',
+  opts:['в точке C','в точке B','одинакова во всех точках','в точке A'], a:1},
+ {type:'mcq', text:'После абсолютно неупругого столкновения двух одинаковых шаров, движущихся навстречу друг другу с одинаковыми по модулю скоростями, шары…',
+  opts:['движутся вместе со скоростью v','разлетаются со скоростью 2v','движутся вместе со скоростью 2v','останавливаются'], a:3},
+ {type:'calc', text:'Найдите импульс тела массой 2 кг, движущегося со скоростью 5 м/с.', unit:'кг·м/с', a:10},
+ {type:'calc', text:'Тележка массой 4 кг, движущаяся со скоростью 3 м/с, сцепляется с неподвижной тележкой массой 2 кг. Найдите скорость тележек после сцепки.', unit:'м/с', a:2},
+ {type:'calc', text:'Камень падает с высоты 20 м без начальной скорости. Найдите скорость камня у поверхности Земли. Сопротивление воздуха не учитывать, g = 10 м/с².', unit:'м/с', a:20},
+ {type:'calc', text:'Тело массой 0,5 кг движется со скоростью 4 м/с. Найдите кинетическую энергию тела.', unit:'Дж', a:4}
+],
+'2':[
+ {type:'mcq', text:'Закон сохранения механической энергии выполняется…',
+  opts:['в любых системах тел','в любой системе при наличии трения','в системе, где действуют только консервативные силы (трение отсутствует)','только при неупругих столкновениях'], a:2},
+ {type:'mcq', form:true, text:'Потенциальная энергия тела массой m, поднятого на высоту h над поверхностью Земли, определяется по формуле:',
+  opts:['Eₚ = mv','Eₚ = mgh','Eₚ = kx²/2','Eₚ = mv²/2'], a:1},
+ {type:'mcq', form:true, text:'Шар массой m падает с высоты h без начальной скорости. Сопротивление воздуха не учитывать. У поверхности Земли кинетическая энергия шара равна…',
+  opts:['2mgh','0','mgh/2','mgh'], a:3},
+ {type:'mcq', fig:'v2q4', text:'Два одинаковых шара движутся навстречу друг другу со скоростями по 2 м/с каждый (см. рисунок). Что произойдёт после абсолютно упругого центрального удара шаров?',
+  opts:['шары движутся вместе со скоростью 4 м/с','шары разлетаются со скоростями по 2 м/с','шары останавливаются','шары разлетаются со скоростями по 4 м/с'], a:1},
+ {type:'mcq', fig:'v2q5', text:'Пружина растянута на величину x (см. рисунок). Во сколько раз увеличится потенциальная энергия пружины, если её деформацию увеличить в 2 раза?',
+  opts:['в 4 раза','в 2 раза','уменьшится в 2 раза','не изменится'], a:0},
+ {type:'mcq', fig:'v2q6', text:'На графике показана зависимость потенциальной энергии тела от высоты подъёма над Землёй (g = 10 м/с²). Определите массу тела.',
+  opts:['1 кг','0,5 кг','4 кг','2 кг'], a:3},
+ {type:'calc', text:'Найдите импульс тела массой 3 кг, движущегося со скоростью 4 м/с.', unit:'кг·м/с', a:12},
+ {type:'calc', text:'Пуля массой 10 г, летящая со скоростью 400 м/с, попадает в неподвижный брусок массой 990 г и застревает в нём. Найдите скорость бруска с пулей.', unit:'м/с', a:4},
+ {type:'calc', fig:'v2q9', text:'Мяч брошен вертикально вверх со скоростью 10 м/с. Найдите максимальную высоту подъёма мяча. g = 10 м/с².', unit:'м', a:5},
+ {type:'calc', text:'Найдите потенциальную энергию тела массой 2 кг, находящегося на высоте 15 м над поверхностью Земли. g = 10 м/с².', unit:'Дж', a:300}
+]};
+
+/* ─────────── СОСТОЯНИЕ ─────────── */
+const T_TOTAL = 90, CIRC = 163.36, RCIRC = 364.42;
+const S = {fio:'',klass:'',variant:'',qs:[],q:0,answers:Array(10).fill(null),
+           selected:null,timeLeft:T_TOTAL,timerId:null,attempts:0,score:0,
+           inQuiz:false,finished:false,advancing:false,warns:0};
+let QS = [];
+
+/* ─────────── НАВИГАЦИЯ ─────────── */
+const showScreen = id => { $$('.screen').forEach(s=>s.classList.toggle('active', s.id===id)); window.scrollTo({top:0}); };
+const showToast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1400); };
+
+/* ─────────── ПОПЫТКИ (localStorage) ─────────── */
+const attKey = () => 'fiz10_att:' + (S.fio+'|'+S.klass).trim().toLowerCase();
+function readAttempts(fio,klass){
+  try{ const k='fiz10_att:'+(fio+'|'+klass).trim().toLowerCase(); return Number(localStorage.getItem(k)||0); }catch(e){ return 0; }
+}
+function bumpAttempt(){
+  try{ const k=attKey(), n=Number(localStorage.getItem(k)||0)+1; localStorage.setItem(k,String(n)); return n; }catch(e){ return 1; }
+}
+
+/* ─────────── ОКНО 1 → ОКНО 2 ─────────── */
+function refreshAttNote(){
+  const fio=$('#inpFio').value.trim(), k=$('#selKlass').value, n=$('#attNote');
+  const c=readAttempts(fio,k);
+  if(c>0 && fio.length>2 && k){ n.hidden=false; n.textContent=`⚠ Вы уже использовали попыток: ${c}`; } else n.hidden=true;
+}
+['inpFio','selKlass'].forEach(id=>$('#'+id).addEventListener('change',refreshAttNote));
+$('#inpFio').addEventListener('input',refreshAttNote);
+
+$('#btnToRules').addEventListener('click',()=>{
+  const fio=$('#inpFio').value.trim(), klass=$('#selKlass').value, variant=$('#selVariant').value;
+  if(fio.length<3 || !klass || !variant){ $('#startErr').classList.add('on'); setTimeout(()=>$('#startErr').classList.remove('on'),1800); return; }
+  S.fio=fio; S.klass=klass; S.variant=variant;
+  showScreen('screen-disclaimer');
+});
+$('#chkAgree').addEventListener('change',e=>$('#btnStart').classList.toggle('lit',e.target.checked));
+
+/* ─────────── СТАРТ ТЕСТА ─────────── */
+$('#btnStart').addEventListener('click',()=>{
+  if(!$('#chkAgree').checked) return;
+  QS = BANK[S.variant];
+  S.q=0; S.answers=Array(10).fill(null); S.selected=null; S.score=0;
+  S.finished=false; S.advancing=false; S.warns=0;
+  S.attempts=bumpAttempt();
+  $('#chipFio').textContent='👤 '+S.fio;
+  $('#chipKlass').textContent=S.klass;
+  $('#chipVar').textContent='Вариант '+S.variant;
+  showScreen('screen-quiz');
+  S.inQuiz=true;
+  renderQuestion();
+});
+
+/* ─────────── ОТРИСОВКА ВОПРОСА ─────────── */
+function renderQuestion(){
+  const q=QS[S.q];
+  S.selected=null;
+  $('#qNum').textContent=S.q+1;
+  $('#qBar').style.width=(S.q*10)+'%';
+  $('#qType').textContent = q.type==='mcq' ? 'Тест · один ответ' : 'Расчётная задача · число';
+  $('#qType').className   = 'qtype ' + (q.type==='mcq' ? 't-mcq' : 't-calc');
+  $('#qText').textContent = q.text;
+  $('#qText').classList.toggle('qformulas', !!q.form);
+  $('#qFig').innerHTML    = q.fig ? SVGS[q.fig] : '';
+  $('#qCard').classList.remove('locked');
+  const btn=$('#btnNext'); btn.classList.remove('lit'); btn.disabled=true;
+  btn.textContent = S.q===9 ? 'Завершить тест' : 'Далее →';
+  const body=$('#qBody');
+  if(q.type==='mcq'){
+    body.innerHTML='<div class="opts">'+q.opts.map((o,i)=>
+      `<button class="opt${q.form?' fopt':''}" data-i="${i}"><span class="badge">${'АБВГ'[i]}</span><span class="otext">${o}</span></button>`).join('')+'</div>';
+    body.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+      body.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel'); S.selected=+b.dataset.i; updateNext();
+    }));
+  }else{
+    body.innerHTML=`<div class="calcbox"><input id="calcIn" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="8" placeholder="Ваш ответ"><span class="unit">${q.unit}</span></div>
+    <p class="calcnote">Ответ введите числом, без единиц измерения. Дробную часть можно отделять запятой или точкой.</p>`;
+    const inp=$('#calcIn');
+    inp.addEventListener('input',()=>{ inp.value=inp.value.replace(/[^0-9.,-]/g,''); updateNext(); });
+    setTimeout(()=>inp.focus({preventScroll:true}),450);
+  }
+  startTimer();
+}
+function updateNext(){
+  const q=QS[S.q];
+  let ok=false;
+  if(q.type==='mcq') ok = S.selected!==null;
+  else { const el=$('#calcIn'); ok = !!el && el.value.trim().length>0; }
+  const btn=$('#btnNext'); btn.disabled=!ok; btn.classList.toggle('lit',ok);
+}
+
+/* ─────────── ТАЙМЕР 1:30 ─────────── */
+function startTimer(){
+  stopTimer(); S.timeLeft=T_TOTAL; paintTimer();
+  S.timerId=setInterval(()=>{
+    S.timeLeft--; paintTimer();
+    if(S.timeLeft<=0){ stopTimer(); onTimeout(); }
+  },1000);
+}
+const stopTimer=()=>{ if(S.timerId){ clearInterval(S.timerId); S.timerId=null; } };
+function paintTimer(){
+  const t=Math.max(0,S.timeLeft), m=Math.floor(t/60), s=t%60;
+  $('#tText').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  const ring=$('#tRing');
+  ring.style.strokeDashoffset=CIRC*(1-t/T_TOTAL);
+  ring.classList.toggle('warn', t<=30 && t>10);
+  ring.classList.toggle('danger', t<=10);
+}
+function onTimeout(){
+  if(S.advancing||S.finished) return;
+  S.advancing=true;
+  $('#qCard').classList.add('locked');
+  saveCurrent();
+  showToast('⏱ Время вышло — переходим дальше');
+  setTimeout(advance,900);
+}
+
+/* ─────────── ОТВЕТЫ И ПЕРЕХОДЫ ─────────── */
+function saveCurrent(){
+  const q=QS[S.q];
+  if(q.type==='mcq'){ S.answers[S.q]=S.selected; }
+  else{
+    const el=$('#calcIn');
+    const raw=el?el.value.trim().replace(',','.'):'';
+    const n=parseFloat(raw);
+    S.answers[S.q]=Number.isFinite(n)?n:null;
+  }
+}
+function advance(){
+  S.q++; S.advancing=false;
+  if(S.q<10) renderQuestion(); else finish('done');
+}
+$('#btnNext').addEventListener('click',()=>{
+  if($('#btnNext').disabled||S.advancing||S.finished) return;
+  stopTimer(); saveCurrent(); advance();
+});
+
+/* ─────────── АНТИЧИТ ───────────
+   • скрытие вкладки/браузера (visibilitychange) → немедленное завершение;
+   • выдвижение второго окна поверх теста (blur без скрытия):
+     1-й раз — предупреждение, 2-й раз — завершение;
+   • цифровая клавиатура в расчётных задачах НЕ считается нарушением
+     (особенно важно для iPhone и Samsung — без ложных срабатываний). */
+const keyboardOpen = () => { const a=document.activeElement;
+  return !!(a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA')); };
+
+document.addEventListener('visibilitychange',()=>{
+  if(!S.inQuiz||S.finished) return;
+  if(document.hidden) finish('ac','Вкладка или браузер были свёрнуты.');
+});
+window.addEventListener('blur',()=>{
+  if(!S.inQuiz||S.finished) return;
+  setTimeout(()=>{
+    if(!S.inQuiz||S.finished) return;
+    if(document.hidden) return;          // обрабатывается в visibilitychange
+    if(document.hasFocus()) return;      // ложное срабатывание
+    if(keyboardOpen()) return;           // открыта клавиатура ответа
+    S.warns++;
+    if(S.warns===1){ $('#warnOv').classList.add('on'); }
+    else finish('ac','Повторное выдвижение окна поверх теста.');
+  },350);
+});
+$('#btnWarnOk').addEventListener('click',()=>$('#warnOv').classList.remove('on'));
+window.addEventListener('pagehide',()=>{ // страховка (закрытие страницы)
+  if(S.inQuiz&&!S.finished){ S.finished=true; S.inQuiz=false; beacon('Завершён античитом'); }
+});
+
+/* ─────────── ЗАВЕРШЕНИЕ И РЕЗУЛЬТАТЫ ─────────── */
+function computeScore(){
+  let sc=0;
+  QS.forEach((q,i)=>{
+    const a=S.answers[i];
+    if(a===null||a===undefined) return;
+    if(q.type==='mcq'){ if(a===q.a) sc++; }
+    else if(Math.abs(a-q.a)<=0.02) sc++;
+  });
+  return sc;
+}
+function finish(kind,reason=''){
+  if(S.finished) return;
+  S.finished=true; S.inQuiz=false; stopTimer();
+  $('#warnOv').classList.remove('on');
+  S.score=computeScore();
+  const ac = kind==='ac';
+  const chip=$('#statusChip');
+  chip.textContent = ac?'Завершено античитом':'Тест завершён';
+  chip.className = 'statuschip '+(ac?'bad':'ok');
+  $('#resReason').hidden=!ac; $('#resReason').textContent='Причина: '+reason;
+  $('#resScore').textContent=S.score;
+  const ring=$('#ringFg');
+  ring.style.strokeDashoffset=RCIRC;
+  const col = S.score>=9?'var(--gn)':S.score>=7?'var(--cy)':S.score>=5?'var(--am)':'var(--rd)';
+  ring.style.stroke=col;
+  $('#resVerdict').textContent = ac ? 'Тест прерван системой античита'
+    : S.score>=9?'Отлично!':S.score>=7?'Хорошо':S.score>=5?'Удовлетворительно':'Стоит повторить тему';
+  $('#resVerdict').style.color=col;
+  $('#resFio').textContent=S.fio;
+  $('#resKlass').textContent=S.klass;
+  $('#resVariant').textContent='Вариант '+S.variant;
+  $('#resAttempts').textContent=S.attempts;
+  showScreen('screen-result');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    ring.style.strokeDashoffset=RCIRC*(1-S.score/10);
+  }));
+  sendToSheets(ac?'Завершён античитом':'Завершён');
+}
+
+/* ─────────── ОТПРАВКА В GOOGLE SHEETS ─────────── */
+function sendToSheets(status){
+  const line=$('#sendStatus');
+  if(!SHEET_URL||SHEET_URL.includes('ВСТАВЬТЕ')){
+    line.innerHTML='⚠ Отправка не настроена: вставьте URL Apps Script в константу SHEET_URL.'; return;
+  }
+  line.innerHTML='<span class="spin"></span> Отправка результата учителю…';
+  const body=new URLSearchParams({fio:S.fio,klass:S.klass,variant:S.variant,score:S.score,attempts:S.attempts,status});
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',body})
+    .then(()=>{ line.innerHTML='✅ Результат отправлен в Google Таблицы'; })
+    .catch(()=>{
+      if(beacon(status)) line.innerHTML='✅ Результат отправлен (резервный канал)';
+      else line.innerHTML='❌ Нет связи. Сфотографируйте результат и отправьте учителю.';
+    });
+}
+function beacon(status){
+  try{
+    const body=new URLSearchParams({fio:S.fio,klass:S.klass,variant:S.variant,score:S.score,attempts:S.attempts,status});
+    return navigator.sendBeacon(SHEET_URL,new Blob([body],{type:'application/x-www-form-urlencoded'}));
+  }catch(e){ return false; }
+}
+$('#btnHome').addEventListener('click',()=>{ refreshAttNote(); showScreen('screen-start'); });
+refreshAttNote();
+</script>
+</body>
+</html>
